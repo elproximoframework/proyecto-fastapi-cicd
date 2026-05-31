@@ -22,30 +22,33 @@ class TestProductsEndpoint:
         # 1. Registrar usuario para poder crear el producto
         reg_response = await client.post("/api/v1/users/", json=user_payload)
         assert reg_response.status_code == 201
-        
+
         # 2. Obtener token JWT de inicio de sesión
-        login_response = await client.post("/api/v1/auth/token", data={
-            "username": user_payload["email"],
-            "password": user_payload["password"],
-        })
+        login_response = await client.post(
+            "/api/v1/auth/token",
+            data={
+                "username": user_payload["email"],
+                "password": user_payload["password"],
+            },
+        )
         assert login_response.status_code == 200
         token = login_response.json()["access_token"]
-        
+
         # 3. Crear un producto de prueba
         product_payload = {
             "name": "Laptop de Test",
             "description": "Una laptop de prueba",
             "price": 1000.0,
-            "stock": 5
+            "stock": 5,
         }
         prod_response = await client.post(
             "/api/v1/products/",
             json=product_payload,
-            headers={"Authorization": f"Bearer {token}"}
+            headers={"Authorization": f"Bearer {token}"},
         )
         assert prod_response.status_code == 201
         product_id = prod_response.json()["id"]
-        
+
         # 4. Calcular descuento del 15% de forma pública
         discount_response = await client.get(
             f"/api/v1/products/{product_id}/discount?percentage=15"

@@ -1,4 +1,5 @@
 from typing import Any, List
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -14,9 +15,7 @@ router = APIRouter()
 
 @router.post("/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def create_user(
-    *,
-    db: AsyncSession = Depends(get_db),
-    user_in: UserCreate
+    *, db: AsyncSession = Depends(get_db), user_in: UserCreate
 ) -> Any:
     """Registra un nuevo usuario en la base de datos."""
     # Verificar si el email ya está registrado
@@ -27,7 +26,7 @@ async def create_user(
             status_code=status.HTTP_409_CONFLICT,
             detail="The user with this email already registered in the system.",
         )
-        
+
     # Crear nuevo objeto User con contraseña hasheada
     db_obj = User(
         email=user_in.email,
@@ -42,9 +41,7 @@ async def create_user(
 
 
 @router.get("/me", response_model=UserResponse)
-async def read_user_me(
-    current_user: User = Depends(get_current_user)
-) -> Any:
+async def read_user_me(current_user: User = Depends(get_current_user)) -> Any:
     """Obtiene los datos del perfil del usuario actualmente autenticado."""
     return current_user
 
@@ -54,7 +51,7 @@ async def read_users(
     db: AsyncSession = Depends(get_db),
     skip: int = 0,
     limit: int = 100,
-    current_user: User = Depends(get_current_user) # Requiere autenticación
+    current_user: User = Depends(get_current_user),  # Requiere autenticación
 ) -> Any:
     """Obtiene una lista de todos los usuarios registrados."""
     result = await db.execute(select(User).offset(skip).limit(limit))

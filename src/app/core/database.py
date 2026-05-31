@@ -1,15 +1,12 @@
 from typing import AsyncGenerator
+
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 from src.app.core.config import settings
 
 # Crear motor asíncrono
-engine = create_async_engine(
-    settings.DATABASE_URL,
-    echo=False,
-    future=True
-)
+engine = create_async_engine(settings.DATABASE_URL, echo=False, future=True)
 
 # Constructor de sesiones asíncronas
 async_session_maker = sessionmaker(
@@ -17,7 +14,7 @@ async_session_maker = sessionmaker(
     class_=AsyncSession,
     expire_on_commit=False,
     autocommit=False,
-    autoflush=False
+    autoflush=False,
 )
 
 
