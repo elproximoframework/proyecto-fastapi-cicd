@@ -1,4 +1,5 @@
 from typing import Any, List
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -17,7 +18,7 @@ async def create_product(
     *,
     db: AsyncSession = Depends(get_db),
     product_in: ProductCreate,
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ) -> Any:
     """Crea un nuevo producto asociado al usuario autenticado."""
     db_obj = Product(
@@ -25,7 +26,7 @@ async def create_product(
         description=product_in.description,
         price=product_in.price,
         stock=product_in.stock,
-        owner_id=current_user.id
+        owner_id=current_user.id,
     )
     db.add(db_obj)
     await db.commit()
@@ -35,9 +36,7 @@ async def create_product(
 
 @router.get("/", response_model=List[ProductResponse])
 async def read_products(
-    db: AsyncSession = Depends(get_db),
-    skip: int = 0,
-    limit: int = 100
+    db: AsyncSession = Depends(get_db), skip: int = 0, limit: int = 100
 ) -> Any:
     """Obtiene el listado de productos de forma pública."""
     result = await db.execute(select(Product).offset(skip).limit(limit))
@@ -46,50 +45,42 @@ async def read_products(
 
 
 @router.get("/{product_id}", response_model=ProductResponse)
-async def read_product(
-    product_id: int,
-    db: AsyncSession = Depends(get_db)
-) -> Any:
+async def read_product(product_id: int, db: AsyncSession = Depends(get_db)) -> Any:
     """Obtiene un producto específico por su ID."""
     result = await db.execute(select(Product).filter(Product.id == product_id))
     product = result.scalars().first()
     if not product:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Product not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Product not found"
         )
     return product
 
 
 @router.get("/{product_id}/discount", response_model=dict)
 async def get_product_discount(
-    product_id: int,
-    percentage: float,
-    db: AsyncSession = Depends(get_db)
+    product_id: int, percentage: float, db: AsyncSession = Depends(get_db)
 ) -> Any:
     """Calcula el precio final de un producto aplicando un porcentaje de descuento (0-100)."""
     if percentage < 0 or percentage > 100:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Discount percentage must be between 0 and 100"
+            detail="Discount percentage must be between 0 and 100",
         )
-        
+
     result = await db.execute(select(Product).filter(Product.id == product_id))
     product = result.scalars().first()
     if not product:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Product not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Product not found"
         )
-        
+
     discount_amount = product.price * (percentage / 100)
     final_price = product.price - discount_amount
-    
+
     return {
         "product_id": product.id,
         "original_price": product.price,
         "discount_percentage": percentage,
         "discount_amount": round(discount_amount, 2),
-        "final_price": round(final_price, 2)
+        "final_price": round(final_price, 2),
     }
-

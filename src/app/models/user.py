@@ -15,4 +15,6 @@ class User(Base):
     is_superuser = Column(Boolean, default=False)
 
     # Relación con productos creados por el usuario
-    products = relationship("Product", back_populates="owner", cascade="all, delete-orphan")
+    products = relationship(
+        "Product", back_populates="owner", cascade="all, delete-orphan"
+    )

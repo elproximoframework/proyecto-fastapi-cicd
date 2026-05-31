@@ -19,11 +19,14 @@ class TestUserCreateSchema:
             UserCreate(email="test@example.com", password="weak")
         assert "password" in str(exc_info.value)
 
-    @pytest.mark.parametrize("email", [
-        "user@domain.com",
-        "user+tag@domain.co.uk",
-        "user.name@subdomain.domain.org",
-    ])
+    @pytest.mark.parametrize(
+        "email",
+        [
+            "user@domain.com",
+            "user+tag@domain.co.uk",
+            "user.name@subdomain.domain.org",
+        ],
+    )
     def test_valid_email_formats(self, email: str):
         user = UserCreate(email=email, password="Valid123!")
         assert user.email == email

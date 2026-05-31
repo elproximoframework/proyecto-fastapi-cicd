@@ -17,7 +17,7 @@ class TestUsersEndpoint:
     async def test_create_user_duplicate_email(self, client: AsyncClient, user_payload):
         # 1. Primer registro exitoso
         await client.post("/api/v1/users/", json=user_payload)
-        
+
         # 2. Intentar registrar el mismo email de nuevo
         response = await client.post("/api/v1/users/", json=user_payload)
         assert response.status_code == 409
@@ -36,10 +36,13 @@ class TestUsersEndpoint:
         assert reg_response.status_code == 201
 
         # 2. Iniciar sesión para obtener el JWT token
-        login_response = await client.post("/api/v1/auth/token", data={
-            "username": user_payload["email"],
-            "password": user_payload["password"],
-        })
+        login_response = await client.post(
+            "/api/v1/auth/token",
+            data={
+                "username": user_payload["email"],
+                "password": user_payload["password"],
+            },
+        )
         assert login_response.status_code == 200
         token_data = login_response.json()
         assert "access_token" in token_data
@@ -48,8 +51,7 @@ class TestUsersEndpoint:
 
         # 3. Acceder al recurso protegido /me usando el token JWT
         me_response = await client.get(
-            "/api/v1/users/me",
-            headers={"Authorization": f"Bearer {token}"}
+            "/api/v1/users/me", headers={"Authorization": f"Bearer {token}"}
         )
         assert me_response.status_code == 200
         assert me_response.json()["email"] == user_payload["email"]

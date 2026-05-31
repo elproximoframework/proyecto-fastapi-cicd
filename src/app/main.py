@@ -1,10 +1,11 @@
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.app.core.config import settings
-from src.app.core.database import engine, Base
 from src.app.api.v1.router import api_router
+from src.app.core.config import settings
+from src.app.core.database import Base, engine
 
 
 @asynccontextmanager
@@ -17,11 +18,7 @@ async def lifespan(app: FastAPI):
     await engine.dispose()
 
 
-app = FastAPI(
-    title=settings.PROJECT_NAME,
-    version=settings.VERSION,
-    lifespan=lifespan
-)
+app = FastAPI(title=settings.PROJECT_NAME, version=settings.VERSION, lifespan=lifespan)
 
 # Configuración de CORS
 app.add_middleware(
@@ -40,7 +37,6 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 async def health_check():
     """Endpoint básico para validar que el servicio está activo (usado por Docker/AWS)."""
     return {"status": "healthy", "environment": settings.ENVIRONMENT}
-
 
 
 @app.get("/version", tags=["Salud"])
