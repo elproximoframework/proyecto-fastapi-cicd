@@ -39,7 +39,8 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 @app.get("/health", tags=["Salud"])
 async def health_check():
     """Endpoint básico para validar que el servicio está activo (usado por Docker/AWS)."""
-    return {"status": "healthy"}
+    return {"status": "healthy", "environment": settings.ENVIRONMENT}
+
 
 
 @app.get("/version", tags=["Salud"])
