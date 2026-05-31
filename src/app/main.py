@@ -43,3 +43,13 @@ async def health_check():
 async def get_version():
     """Retorna la versión actual de la API."""
     return {"version": settings.VERSION}
+
+
+@app.get("/about", tags=["Salud"])
+async def get_about():
+    """Retorna información descriptiva sobre este proyecto MLOps."""
+    return {
+        "project": "API de Práctica de CI/CD",
+        "description": "FastAPI robusto integrado con Docker y GitHub Actions",
+        "author": "AI Engineer & DevOps Specialist",
+    }
