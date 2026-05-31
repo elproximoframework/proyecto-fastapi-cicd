@@ -39,5 +39,5 @@ async def login_access_token(
         access_token=create_access_token(
             user.email, expires_delta=access_token_expires
         ),
-        token_type="bearer",
+        token_type="bearer",  # nosec B106
     )
