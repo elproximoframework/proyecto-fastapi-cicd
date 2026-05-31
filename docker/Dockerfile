@@ -21,7 +21,7 @@ FROM python:3.12-slim AS test-runner
 WORKDIR /app
 COPY --from=builder /app/wheels /wheels
 COPY pyproject.toml .
-RUN pip install --no-cache-dir --no-index --find-links=/wheels ".[dev]" && \
+RUN pip install --no-cache-dir --no-index --find-links=/wheels /wheels/*.whl && \
     rm -rf /wheels
 
 COPY . .
