@@ -1,6 +1,5 @@
-import asyncio
 import os
-from typing import AsyncGenerator, Generator
+from typing import AsyncGenerator
 
 import pytest
 import pytest_asyncio
@@ -8,7 +7,6 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.pool import NullPool
 
-from src.app.core.config import settings
 from src.app.core.database import Base, get_db
 from src.app.main import app
 
