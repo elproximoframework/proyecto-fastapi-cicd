@@ -12,10 +12,10 @@ from src.app.core.config import settings
 from src.app.core.database import Base, get_db
 from src.app.main import app
 
-# Cargar URL de la base de datos de test de variables de entorno o usar local (puerto 5433 expuesto para tests)
+# Cargar URL de la base de datos de test de variables de entorno o usar local (puerto 5435 expuesto para tests)
 TEST_DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql+asyncpg://postgres:password@localhost:5433/testdb"
+    "postgresql+asyncpg://postgres:password@localhost:5435/testdb"
 )
 
 # Crear motor asíncrono para la base de datos de pruebas
@@ -36,12 +36,14 @@ async def prepare_database():
 
 @pytest_asyncio.fixture
 async def db_session(prepare_database) -> AsyncGenerator[AsyncSession, None]:
-    """Sesión de base de datos para cada test con rollback automático."""
-    async_session = AsyncSession(engine_test, expire_on_commit=False)
-    async with async_session as session:
-        async with session.begin():
-            yield session
-            await session.rollback()
+    """Sesión de base de datos para cada test con truncado de tablas al final para aislamiento total."""
+    async with AsyncSession(engine_test, expire_on_commit=False) as session:
+        yield session
+    
+    # Limpiar datos e IDs auto-incrementales para el siguiente test
+    from sqlalchemy import text
+    async with engine_test.begin() as conn:
+        await conn.execute(text("TRUNCATE TABLE products, users RESTART IDENTITY CASCADE;"))
 
 
 @pytest_asyncio.fixture
@@ -53,7 +55,9 @@ async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     # Inyectar dependencia
     app.dependency_overrides[get_db] = override_get_db
 
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    from httpx import ASGITransport
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
 
     # Limpiar inyección

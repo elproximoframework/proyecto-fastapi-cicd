@@ -55,7 +55,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: testdb
     ports:
-      - "5433:5432"
+      - "5435:5432"
     tmpfs:
       - /var/lib/postgresql/data  # Almacenamiento en memoria para pruebas ultrarrápidas
     healthcheck:
