@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+.env
+
+# Variables de entorno y secrets
+.env
+.env.local
+.env.*.local
+*.env
+secrets.yaml
+config/local.py
+
+# Base de datos
+*.db
+*.sqlite3
+
+# Tests y coverage
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.tox/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker
+.docker/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+*.log
+
+# FastAPI específico
+alembic.ini.local
+migrations/versions/*.py
